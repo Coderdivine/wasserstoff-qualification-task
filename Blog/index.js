@@ -4,8 +4,9 @@ const router = express.Router();
 const uuid = require("uuid");
 const {Export_BlogSchema,Export_UserSchema} = require("../Model");
 const {ScoreColor,NewPercentage} = require("../Utilities");
+const {Header} = require("../Authentication");
 
-router.post("/post-blog",async(req,res)=>{
+router.post("/post-blog",Header,async(req,res)=>{
     try{ 
         const {author,title,author_id,post} = req.body;
         if(author.length < 4){res.status(404).json({message:"Author name is not valid"}).end()}
@@ -38,7 +39,7 @@ router.post("/post-blog",async(req,res)=>{
         });
     }
 })
-router.post("/user-posts",async(req,res)=>{
+router.post("/user-posts",Header,async(req,res)=>{
     try{
         const user_id = req.body.user_id;
         const posts = await Export_BlogSchema.find({author_id:user_id});
@@ -52,7 +53,7 @@ router.post("/user-posts",async(req,res)=>{
         }).end();
     }
 })
-router.post("/evaluate-post",async(req,res)=>{
+router.post("/evaluate-post",Header,async(req,res)=>{
   try{ 
      const {blog_id,item_id,score} = req.body;
      const Blog = Export_BlogSchema.find({ide:blog_id});

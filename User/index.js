@@ -2,9 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const uuid = require("uuid")
 const router = express.Router();
+const {Header} = require("../Authentication");
 const {Export_UserSchema} = require("../Model");
 
-router.post("/authenticate-user",async(req,res)=>{
+router.post("/authenticate-user",Header,async(req,res)=>{
     try{ 
         const {username} = req.body;
         const is_username = await Export_UserSchema.find({username});
