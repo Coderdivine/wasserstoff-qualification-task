@@ -3,10 +3,10 @@ const cors = require("cors");
 const router = express.Router();
 const uuid = require("uuid");
 const {Export_BlogSchema,Export_UserSchema} = require("../Model");
-const {ScoreColor,NewPercentage} = require("../Utilities");
+const {ScoreColor,NewPercentage,UpdateAnArray} = require("../Utilities");
 const {Header} = require("../Authentication");
 
-router.post("/post-blog",Header,async(req,res)=>{
+router.post("/post-blog",async(req,res)=>{
     try{ 
         const {author,title,author_id,post} = req.body;
         if(author.length < 4){res.status(404).json({message:"Author name is not valid"}).end()}
@@ -16,9 +16,7 @@ router.post("/post-blog",Header,async(req,res)=>{
             const post_to_json = JSON.parse(post);
             if(post_to_json.length > 3){
                 const ide = uuid.v4();
-                const number_of_text = post_to_json.length * 4;
-                const sum = await post_to_json.reduce((index,x)=>{return index + Number(x.point)},0);
-                const percentage = (sum/number_of_text) * 100;
+                const percentage = await NewPercentage(post_to_json);
                 const AddPost = new Export_BlogSchema({
                     author,title,ide,post,percentage
                 });
@@ -39,7 +37,7 @@ router.post("/post-blog",Header,async(req,res)=>{
         });
     }
 })
-router.post("/user-posts",Header,async(req,res)=>{
+router.post("/user-posts",async(req,res)=>{
     try{
         const user_id = req.body.user_id;
         const posts = await Export_BlogSchema.find({author_id:user_id});
@@ -53,10 +51,24 @@ router.post("/user-posts",Header,async(req,res)=>{
         }).end();
     }
 })
-router.post("/evaluate-post",Header,async(req,res)=>{
+router.post("/a-blog",async(req,res)=>{
+    try{
+        const blog_id = req.body.id;
+        const posts = await Export_BlogSchema.find({ide:blog_id});
+        res.status(200).json({
+            message:"User post found",
+            posts:posts[0]
+        }).end();
+    }catch(error){
+        res.status(500).json({
+            message:error.message
+        }).end();
+    }
+})
+router.post("/evaluate-post",async(req,res)=>{
   try{ 
      const {blog_id,item_id,score} = req.body;
-     const Blog = Export_BlogSchema.find({ide:blog_id});
+     const Blog = await Export_BlogSchema.find({ide:blog_id});
      if(Blog.length){
         const post_to_json = JSON.parse(Blog[0].post);
         const item = post_to_json[Number(item_id)]
@@ -66,9 +78,11 @@ router.post("/evaluate-post",Header,async(req,res)=>{
         //Update item with new item...
         const newArray = await UpdateAnArray(new_item,post_to_json,Number(item_id))
         const post = JSON.stringify(newArray);
-        console.log(post);
-        const update = await Export_BlogSchema.updateOne({ ide:blog_id }, { post });
-        if(update){
+        console.log(newArray);
+        const percentage = NewPercentage(newArray);
+        const update_post = await Export_BlogSchema.updateOne({ ide:blog_id }, { post });
+        const update_percent = await Export_BlogSchema.updateOne({ ide:blog_id }, { percentage });
+        if(update_post && update_percent){
             res.status(201).json({
                 message:"Post updated"
             });
@@ -89,7 +103,7 @@ router.post("/evaluate-post",Header,async(req,res)=>{
      }).end();
   }
 });
-router.post("/update-post",Header,async(req,res)=>{
+router.post("/update-post",async(req,res)=>{
     try{
         const {post,blog_id} = req.body;
         if(typeof post == "string"){res.status(404).json({message:"New Post is not a string"}).end()};

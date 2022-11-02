@@ -5,7 +5,7 @@ const router = express.Router();
 const {Header} = require("../Authentication");
 const {Export_UserSchema} = require("../Model");
 
-router.post("/authenticate-user",Header,async(req,res)=>{
+router.post("/authenticate-user",async(req,res)=>{
     try{ 
         const {username} = req.body;
         const is_username = await Export_UserSchema.find({username});
@@ -23,8 +23,7 @@ router.post("/authenticate-user",Header,async(req,res)=>{
              const AddUser = new Export_UserSchema({
                 username,ide
              })
-            }
-            AddUser.svae().then(result=>{
+             AddUser.save().then(result=>{
                 res.status(201).json({
                     message:"New User addd",
                     user:"@new_user",
@@ -38,6 +37,8 @@ router.post("/authenticate-user",Header,async(req,res)=>{
                     message:err.message
                 }).end()
             })
+            }
+            
         }else{
             res.status(400).json({
                 message:"Please username must be greater than four"

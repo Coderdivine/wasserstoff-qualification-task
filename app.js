@@ -12,8 +12,8 @@ const port = process.env.PORT || 1369;
 require("./DBConnection");
 const User = require("./User");
 const Blog = require("./Blog");
-app.use("/admin",User);
-app.use("/user",Blog);
+app.use("/blog",Blog);
+app.use("/user",User);
 
 
 app.listen(port, () => {
