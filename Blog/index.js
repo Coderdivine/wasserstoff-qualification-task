@@ -13,7 +13,7 @@ router.post("/post-blog",Header,async(req,res)=>{
         if(title.length < 9){res.status(404).json({message:"Title most be greater than 9 words"}).end()}
         if(author_id.length < 10){res.status(404).json({message:"Author ID undefined"}).end()}
         if(typeof post == "string"){
-            const post_to_json = JSON.strinify(post);
+            const post_to_json = JSON.parse(post);
             if(post_to_json.length > 3){
                 const ide = uuid.v4();
                 const number_of_text = post_to_json.length * 4;
@@ -58,12 +58,26 @@ router.post("/evaluate-post",Header,async(req,res)=>{
      const {blog_id,item_id,score} = req.body;
      const Blog = Export_BlogSchema.find({ide:blog_id});
      if(Blog.length){
-        const post_to_json = JSON.stringify(Blog[0].post);
+        const post_to_json = JSON.parse(Blog[0].post);
         const item = post_to_json[Number(item_id)]
         const text = item.text;
         const color = await ScoreColor(score)
         const new_item = {score,color,text,item_id};
         //Update item with new item...
+        const newArray = await UpdateAnArray(new_item,post_to_json,Number(item_id))
+        const post = JSON.stringify(newArray);
+        console.log(post);
+        const update = await Export_BlogSchema.updateOne({ ide:blog_id }, { post });
+        if(update){
+            res.status(201).json({
+                message:"Post updated"
+            });
+        }else{
+            console.log(update);
+            res.json({
+                message:"An error occured while updating"
+            })
+        }
      }else{
         res.status(404).json({
             message:"Blog not found"
@@ -75,5 +89,27 @@ router.post("/evaluate-post",Header,async(req,res)=>{
      }).end();
   }
 });
+router.post("/update-post",Header,async(req,res)=>{
+    try{
+        const {post,blog_id} = req.body;
+        if(typeof post == "string"){res.status(404).json({message:"New Post is not a string"}).end()};
+        if(blog_id.length > 4){res.status(404).json({message:"New Post is not a string"}).end()}
+        const update = await Export_BlogSchema.updateOne({ ide:blog_id }, { post });
+        if(update){
+            res.status(201).json({
+                message:"Post updated"
+            });
+        }else{
+            console.log(update);
+            res.json({
+                message:"An error occured while updating"
+            })
+        }
+    }catch(error){
+        res.status(500).json({
+            message:error.message
+        })
+    }
+})
 
 module.exports = router;
