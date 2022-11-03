@@ -6,11 +6,17 @@ const {Header} = require("../Authentication");
 const {Export_UserSchema} = require("../Model");
 
 router.post("/authenticate-user",async(req,res)=>{
+          /*This function check if a user exists or not.
+            If a user exists, we would return the user details 
+            Else we create a new user with the username
+          */
     try{ 
         const {username} = req.body;
-        const is_username = await Export_UserSchema.find({username});
+        const is_username = await Export_UserSchema.find({username});//search of user in database 
         if(username.length > 4 && is_username){
+        //check if username entered exists and is greater than
             if(is_username.length){
+              //if response has length that means the user exists
                 res.status(200).json({
                     message:"User Logged In",
                     enum:"@user",
@@ -19,10 +25,12 @@ router.post("/authenticate-user",async(req,res)=>{
                         ide:is_username[0].ide}
                 })
             }else{
-                const ide = uuid.v4();
+                //else we would create a user with the username entered 
+                const ide = uuid.v4();//we use v4 function to generate random string 
              const AddUser = new Export_UserSchema({
                 username,ide
              })
+            //To store AddUser to the database, I called the save function 
              AddUser.save().then(result=>{
                 res.status(201).json({
                     message:"New User addd",
@@ -51,4 +59,4 @@ router.post("/authenticate-user",async(req,res)=>{
     }
 })
 
-module.exports = router;
+module.exports = router;//exported router (This process is required by express)
