@@ -14,7 +14,7 @@ router.post("/authenticate-user",async(req,res)=>{
         const {username} = req.body;
         const is_username = await Export_UserSchema.find({username});//search of user in database 
         if(username.length > 4 && is_username){
-        //check if username entered exists and is greater than
+        //check if username entered exists and is greater than four...
             if(is_username.length){
               //if response has length that means the user exists
                 res.status(200).json({
