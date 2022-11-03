@@ -78,18 +78,21 @@ router.post("/evaluate-post",async(req,res)=>{
 //types of break out ()/\|}{[],'.
   try{ 
      const {blog_id,item_id,score} = req.body;
+     console.log({item_id})
      const Blog = await Export_BlogSchema.find({ide:blog_id});// function search for blog
      if(Blog.length){
         const post_to_json = JSON.parse(Blog[0].post);//convert the stringify json to json
+        console.log({post_to_json})
         const item = post_to_json[Number(item_id)]//Find the item in json
+        console.log({item})
         const text = item.text;
         const color = await ScoreColor(score)// update color by score Ref:(../Utilities) for code explanation 
         const new_item = {score,color,text,item_id}; // store new item in one state
         //Update item with new item...
-        const newArray = await UpdateAnArray(new_item,post_to_json,Number(item_id)) Ref:(../Utilities)
+        const newArray = await UpdateAnArray(new_item,post_to_json,Number(item_id)) //Ref:(../Utilities)
         const post = JSON.stringify(newArray);
         console.log({newArray});
-        const percentage = await NewPercentage(newArray); Ref:(../Utilities) for code explanation 
+        const percentage = await NewPercentage(newArray);// Ref:(../Utilities) for code explanation 
         console.log({percentage})// view new percentage 
         const update_post = await Export_BlogSchema.updateOne({ ide:blog_id }, { post });
         const update_percent = await Export_BlogSchema.updateOne({ ide:blog_id }, { percentage });
