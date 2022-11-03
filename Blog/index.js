@@ -78,8 +78,9 @@ router.post("/evaluate-post",async(req,res)=>{
         //Update item with new item...
         const newArray = await UpdateAnArray(new_item,post_to_json,Number(item_id))
         const post = JSON.stringify(newArray);
-        console.log(newArray);
-        const percentage = NewPercentage(newArray);
+        console.log({newArray});
+        const percentage = await NewPercentage(newArray);
+        console.log({percentage})
         const update_post = await Export_BlogSchema.updateOne({ ide:blog_id }, { post });
         const update_percent = await Export_BlogSchema.updateOne({ ide:blog_id }, { percentage });
         if(update_post && update_percent){

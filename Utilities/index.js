@@ -12,13 +12,20 @@ const NewPercentage = async(post) => {
 }
 const UpdateAnArray = async (newValue,array,id)=>{
     for (const obj of array){
-        if(obj.id === Number(id)){
-            obj = newValue;
-            console.log({obj,array});
+        if(obj.item_id == Number(id)){
+            //{score,color,text,item_id}
+            console.log({obj})
+            obj.score = newValue.score;
+            obj.color = newValue.color;
+            obj.text = newValue.text;
+            obj.item_id = newValue.item_id;
+            console.log({obj});
+            console.log({array_one:array});
             break;
         }
     }
-    console.log(array);
+    console.log({array});
+    return array;
 }
 
 
