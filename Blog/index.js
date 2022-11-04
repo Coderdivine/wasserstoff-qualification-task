@@ -18,11 +18,11 @@ router.post("/post-blog",async(req,res)=>{
         if(author_id.length < 10){res.status(404).json({message:"Author ID undefined"}).end()}//validating author_id same as User identity 
         if(typeof post == "string"){// I checked if the typeof post is a string 
             const post_to_json = JSON.parse(post);//I changed it to json format using the built-in JavaScript function 
-            if(post_to_json.length > 3){// if the post length is greater than 3 that means it's a valid post
-                const ide = uuid.v4();//generated a random string using the v4 function 
+            if(post_to_json.length > 3){ // if the post length is greater than 3 that means it's a valid post
+                const ide = uuid.v4(); //generated a random string using the v4 function 
                 const percentage = await NewPercentage(post_to_json);//calculate new percentage Ref:(../Utilities) to explanation 
                 const AddPost = new Export_BlogSchema({
-                    author,title,ide,post,percentage
+                    author,author_id,title,ide,post,percentage
                 });
                 //The Addpost is a temporary state. We will call the inbuilt save function in mongoose to store it on the database. 
                 AddPost.save().then(()=>{
